@@ -1,9 +1,1 @@
-{
-  "name": "mission-lanka-live",
-  "version": "1.0.0",
-  "description": "Live multiplayer virtual Dussehra escape-room game",
-  "main": "server.js",
-  "scripts": {"start": "node server.js"},
-  "engines": {"node": ">=18"},
-  "dependencies": {"express": "^4.21.2", "socket.io": "^4.8.1"}
-}
+{"name":"mission-lanka-shared-quiz","version":"2.0.0","description":"Live shared-question Dussehra quiz with synchronized Ravan Dahan","main":"server.js","scripts":{"start":"node server.js"},"engines":{"node":">=18"},"dependencies":{"express":"^4.21.2","socket.io":"^4.8.1"}}

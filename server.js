@@ -1,99 +1,27 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const crypto = require('crypto');
-
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-app.use(express.static('public'));
-app.get('/health', (_req, res) => res.json({ ok: true, app: 'Mission Lanka Live' }));
-
-const PORT = process.env.PORT || 3000;
-const HOST_USER = process.env.HOST_USER || 'host';
-const HOST_PASSWORD = process.env.HOST_PASSWORD || 'Lanka!2026';
-const ROOM_CODE = (process.env.ROOM_CODE || 'LANKA25').toUpperCase();
-const DURATION_SECONDS = 15 * 60;
-const teams = [
-  { id:'agni', name:'Agni', color:'#fb7185', icon:'🔥', puzzles:[
-    {q:'Ramayana challenge: Which brother of Ravana left Lanka and joined Rama, later becoming king of Lanka?', hint:'His name begins with V; he chose dharma over loyalty to Ravana.', answer:'VIBHISHANA', word:'DISCERNMENT'},
-    {q:'In many Ramayana tellings, which vanara craftsman is credited with building the bridge to Lanka with the army of vanaras?', hint:'He is associated with the construction of Rama Setu; his name begins with N.', answer:'NALA', word:'TEAMWORK'}]},
-  { id:'vayu', name:'Vayu', color:'#38bdf8', icon:'🌬️', puzzles:[
-    {q:'When Lakshmana was gravely wounded, Hanuman brought a life-restoring herb from which mountain traditionally named in many tellings?', hint:'It is often called the mountain of medicinal herbs; the name starts with D.', answer:'DRONAGIRI', word:'DEVOTION'},
-    {q:'What is the name commonly given to the ninth day of Navratri, observed just before Vijayadashami in many traditions?', hint:'It is also called the Great Navami.', answer:'MAHANAVAMI', word:'PERSEVERANCE'}]},
-  { id:'astra', name:'Astra', color:'#c084fc', icon:'🏹', puzzles:[
-    {q:'Rama is often depicted carrying a bow. What is the traditional name of Rama’s bow in many Hindu traditions?', hint:'It begins with K and is often used as an epithet for Rama too.', answer:'KODANDA', word:'DHARMA'},
-    {q:'What is the other well-known name of Ravana’s son Indrajit, famed for his mastery of illusion and celestial weapons?', hint:'The name means “the one who conquered Indra.”', answer:'MEGHANADA', word:'COURAGE'}]},
-  { id:'vajra', name:'Vajra', color:'#fbbf24', icon:'⚡', puzzles:[
-    {q:'Which wise elder of the vanara army reminded Hanuman of his extraordinary abilities before the leap to Lanka?', hint:'His name begins with J; he is often portrayed as a bear-like king.', answer:'JAMBAVAN', word:'CONFIDENCE'},
-    {q:'In the golden-deer episode, which rakshasa took the form of the deer to lure Rama away from Sita?', hint:'He was compelled by Ravana to help with the abduction plan.', answer:'MARICHA', word:'DISCERNMENT'}]},
-  { id:'surya', name:'Surya', color:'#4ade80', icon:'☀️', puzzles:[
-    {q:'Which woman in Ashoka Vatika, in a well-known Ramayana episode, dreams of Rama’s victory and Ravana’s downfall and comforts Sita?', hint:'Her name begins with T and she is a rakshasi who sympathises with Sita.', answer:'TRIJATA', word:'HOPE'},
-    {q:'In several parts of India, what is the name of the ritual worship of tools, instruments, and vehicles observed during Navratri or Vijayadashami?', hint:'The name combines “ayudha” (weapon/tool) with “puja” (worship).', answer:'AYUDHAPUJA', word:'GRATITUDE'}]}
+const express=require('express');const http=require('http');const {Server}=require('socket.io');const crypto=require('crypto');
+const app=express(),server=http.createServer(app),io=new Server(server);app.use(express.static('public'));app.get('/health',(_,res)=>res.json({ok:true,app:'Mission Lanka Shared Quiz'}));
+const PORT=process.env.PORT||3000,HOST_USER=process.env.HOST_USER||'host',HOST_PASSWORD=process.env.HOST_PASSWORD||'CHANGE_ME_BEFORE_DEPLOY',ROOM_CODE=(process.env.ROOM_CODE||'LANKA25').toUpperCase();
+const teams=[{id:'agni',name:'Agni',icon:'🔥'},{id:'vayu',name:'Vayu',icon:'🌬️'},{id:'astra',name:'Astra',icon:'🏹'},{id:'vajra',name:'Vajra',icon:'⚡'},{id:'surya',name:'Surya',icon:'☀️'}];
+const questions=[
+{q:'Which brother of Ravana left Lanka and joined Rama, later becoming king of Lanka?',hint:'His name begins with V.',answers:['VIBHISHANA','VIBHISANA']},
+{q:'Which vanara craftsman is associated with building Rama Setu?',hint:'His name begins with N.',answers:['NALA']},
+{q:'Which mountain is associated with Hanuman’s mission to bring the life-restoring herb for Lakshmana?',hint:'Often called Dronagiri.',answers:['DRONAGIRI','DRONAGIRI MOUNTAIN']},
+{q:'What is the ninth day of Navratri commonly called?',hint:'Maha _____.',answers:['MAHANAVAMI','MAHA NAVAMI']},
+{q:'What is the traditional name of Rama’s bow?',hint:'It begins with K.',answers:['KODANDA']},
+{q:'What is the other well-known name of Ravana’s son Indrajit?',hint:'It means the one who conquered Indra.',answers:['MEGHANADA','MEGHNAD']},
+{q:'Which elder reminded Hanuman of his extraordinary powers before the leap to Lanka?',hint:'His name begins with J.',answers:['JAMBAVAN','JAMBAVANTA','JAMBAVAN']},
+{q:'Which rakshasa took the form of a golden deer to lure Rama away from Sita?',hint:'His name begins with M.',answers:['MARICHA','MAREechA']},
+{q:'Which woman in Ashoka Vatika comforts Sita and foresees Ravana’s downfall in a well-known episode?',hint:'Her name begins with T.',answers:['TRIJATA']},
+{q:'What is the ritual worship of tools and instruments observed around Vijayadashami called?',hint:'Ayudha + Puja.',answers:['AYUDHAPUJA','AYUDHA PUJA']}
 ];
-let room = freshRoom();
-function freshRoom(){ return { code:ROOM_CODE, status:'lobby', startedAt:null, endsAt:null, createdAt:Date.now(), hostConnected:false, players:{}, teams:Object.fromEntries(teams.map(t=>[t.id,{solved:0,score:0,words:[],heads:0,activePuzzle:0,completed:false}])) , finalUnlocked:false, finaleStarted:false, winner:null, feed:[] }; }
-function safeState(){
- const teamState = teams.map(t=>({id:t.id,name:t.name,color:t.color,icon:t.icon,...room.teams[t.id],members:Object.values(room.players).filter(p=>p.team===t.id).map(p=>({name:p.name,online:p.online,solved:p.solved}))}));
- return {code:room.code,status:room.status,startedAt:room.startedAt,endsAt:room.endsAt,remaining:room.status==='running'?Math.max(0,Math.ceil((room.endsAt-Date.now())/1000)):null,teams:teamState,players:Object.values(room.players).map(p=>({id:p.id,name:p.name,team:p.team,online:p.online,solved:p.solved})),finalUnlocked:room.finalUnlocked,finaleStarted:room.finaleStarted,feed:room.feed.slice(-12),puzzles:teams.map(t=>({team:t.id,puzzle:room.teams[t.id].activePuzzle,items:t.puzzles.map((p,i)=>({q:p.q,hint:p.hint,word:p.word,solved:i<room.teams[t.id].solved}))}))};
-}
-function broadcast(){io.to(ROOM_CODE).emit('state',safeState());}
-function log(message,team){room.feed.push({id:crypto.randomUUID(),at:Date.now(),message,team:team||null});room.feed=room.feed.slice(-30);}
-function teamById(id){return teams.find(t=>t.id===id);}
-function norm(s){return String(s||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');}
-function checkTimeout(){if(room.status==='running' && Date.now()>=room.endsAt){room.status='ended';log('The countdown has ended. Host may launch the finale.');broadcast();}}
-setInterval(()=>{checkTimeout(); if(room.status==='running') broadcast();},1000);
-
-io.on('connection', socket=>{
- socket.emit('state',safeState());
- socket.on('host:login',(data,cb=()=>{})=>{
-   if(String(data?.username||'')!==HOST_USER || String(data?.password||'')!==HOST_PASSWORD) return cb({ok:false,error:'Incorrect host username or password.'});
-   socket.data.role='host'; socket.data.room=ROOM_CODE; socket.join(ROOM_CODE); room.hostConnected=true; socket.emit('host:answers', teams.map(t=>({team:t.id,items:t.puzzles.map(p=>({answer:p.answer,word:p.word,hint:p.hint}))}))); log('Host connected to the control room.'); broadcast(); cb({ok:true,state:safeState()});
- });
- socket.on('player:join',(data,cb=()=>{})=>{
-   if(norm(data?.code)!==ROOM_CODE) return cb({ok:false,error:'That room code is not correct.'});
-   const name=String(data?.name||'').trim().slice(0,32); const team=teamById(String(data?.team||''));
-   if(name.length<2) return cb({ok:false,error:'Please enter a name with at least 2 characters.'});
-   if(!team) return cb({ok:false,error:'Please choose a team.'});
-   if(room.status==='ended' || room.finaleStarted) return cb({ok:false,error:'This game has ended. Ask the host to reset it.'});
-   const id=crypto.randomUUID(); room.players[id]={id,name,team:team.id,online:true,solved:room.teams[team.id].solved,joinedAt:Date.now()};
-   socket.data.role='player';socket.data.playerId=id;socket.data.room=ROOM_CODE;socket.join(ROOM_CODE);log(`${name} joined Team ${team.name}.`,team.id);broadcast();cb({ok:true,id,team:team.name,state:safeState()});
- });
- socket.on('player:answer',(data,cb=()=>{})=>{
-   if(socket.data.role!=='player') return cb({ok:false,error:'Join as a player first.'});
-   checkTimeout(); const player=room.players[socket.data.playerId];
-   if(!player || !player.online) return cb({ok:false,error:'Your player session is no longer active. Rejoin the room.'});
-   if(room.status!=='running') return cb({ok:false,error:'The host has not started the game yet.'});
-   const t=teamById(player.team), ts=room.teams[player.team];
-   if(ts.completed) return cb({ok:false,error:'Your team has completed all its puzzles!'});
-   const index=ts.solved, puzzle=t.puzzles[index];
-   if(!puzzle) return cb({ok:false,error:'No puzzle available.'});
-   if(norm(data?.answer)!==norm(puzzle.answer)) {log(`${player.name} submitted an incorrect answer for Team ${t.name}.`,t.id);broadcast();return cb({ok:false,error:'Not quite! Try again, or ask the host for a hint.'});}
-   ts.solved++;ts.score+=100;ts.words.push(puzzle.word);ts.heads++;player.solved=ts.solved;
-   if(ts.solved>=t.puzzles.length) ts.completed=true; else ts.activePuzzle=ts.solved;
-   log(`💥 Team ${t.name} cracked puzzle ${ts.solved}! Word unlocked: ${puzzle.word}. A Ravan head has burst!`,t.id);
-   if(teams.every(x=>room.teams[x.id].completed)) {room.finalUnlocked=true;log('All teams have completed their challenges. The final code is unlocked!');}
-   broadcast();cb({ok:true,word:puzzle.word,team:t.name,completed:ts.completed,state:safeState()});
- });
- socket.on('player:hint',(_data,cb=()=>{})=>{
-   if(socket.data.role!=='player') return cb({ok:false,error:'Join as a player first.'});
-   const p=room.players[socket.data.playerId]; if(!p)return cb({ok:false,error:'Rejoin the room.'});
-   const t=teamById(p.team), ts=room.teams[p.team]; const puzzle=t.puzzles[ts.solved];
-   if(!puzzle)return cb({ok:false,error:'No hint needed.'});
-   cb({ok:true,hint:puzzle.hint});
- });
- socket.on('host:action',(data,cb=()=>{})=>{
-   if(socket.data.role!=='host')return cb({ok:false,error:'Host login required.'});
-   const action=data?.action;
-   if(action==='start') {if(room.status==='running')return cb({ok:false,error:'Game is already running.'});if(room.status==='ended')return cb({ok:false,error:'Reset the game before starting again.'});room.status='running';room.startedAt=Date.now();room.endsAt=Date.now()+DURATION_SECONDS*1000;log('🚀 Mission Lanka is LIVE! Solve your team puzzles before time runs out.');}
-   else if(action==='pause'){if(room.status!=='running')return cb({ok:false,error:'The game is not running.'});room.status='paused';room.pausedRemaining=Math.max(0,room.endsAt-Date.now());room.endsAt=null;log('Host paused the countdown.');}
-   else if(action==='resume'){if(room.status!=='paused')return cb({ok:false,error:'The game is not paused.'});room.status='running';room.endsAt=Date.now()+(room.pausedRemaining||0);log('Countdown resumed.');}
-   else if(action==='hint'){const team=teamById(String(data.team||''));if(!team)return cb({ok:false,error:'Choose a team.'});const ts=room.teams[team.id],p=team.puzzles[ts.solved];if(!p)return cb({ok:false,error:'That team has finished.'});log(`Host hint for ${team.name}: ${p.hint}`,team.id);}
-   else if(action==='finale'){if(!room.finalUnlocked)return cb({ok:false,error:'The finale unlocks when all five teams finish both puzzles.'});room.finaleStarted=true;room.status='ended';log('🎆 The host launched the final Ravan Dahan! Victory to all teams.');}
-   else if(action==='reset'){room=freshRoom();log('A new Mission Lanka room is ready. Players may need to refresh.');}
-   else return cb({ok:false,error:'Unknown host action.'});
-   broadcast();cb({ok:true,state:safeState()});
- });
- socket.on('disconnect',()=>{if(socket.data.role==='player'&&room.players[socket.data.playerId]){room.players[socket.data.playerId].online=false;log(`${room.players[socket.data.playerId].name} disconnected.`,room.players[socket.data.playerId].team);broadcast();}if(socket.data.role==='host'){room.hostConnected=false;broadcast();}});
-});
-server.listen(PORT,()=>console.log(`Mission Lanka Live listening on ${PORT}`));
+function fresh(){return{code:ROOM_CODE,status:'lobby',questionIndex:0,players:{},scores:Object.fromEntries(teams.map(t=>[t.id,0])),heads:0,headEvents:[],feed:[],winner:null,finaleStarted:false,questionWinner:null};}let game=fresh();
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+function publicState(){return{code:game.code,status:game.status,questionIndex:game.questionIndex,questionCount:questions.length,currentQuestion:game.status==='lobby'?null:(questions[game.questionIndex]?.q||null),players:Object.values(game.players).map(p=>({name:p.name,team:p.team,online:p.online})),teams:teams.map(t=>({...t,score:game.scores[t.id],members:Object.values(game.players).filter(p=>p.team===t.id&&p.online).length})),heads:game.heads,headEvents:game.headEvents,feed:game.feed.slice(-8),winner:game.winner,finaleStarted:game.finaleStarted,questionWinner:game.questionWinner};}
+function broadcast(){io.to(ROOM_CODE).emit('state',publicState());}function log(message,team){game.feed.push({id:crypto.randomUUID(),at:Date.now(),message,team:team||null});game.feed=game.feed.slice(-25);}function teamById(id){return teams.find(t=>t.id===id);}
+io.on('connection',s=>{s.emit('state',publicState());s.on('player:join',(d,cb=()=>{})=>{if(norm(d?.code)!==norm(ROOM_CODE))return cb({ok:false,error:'Incorrect room code.'});let name=String(d?.name||'').trim().slice(0,32),team=teamById(String(d?.team||''));if(name.length<2)return cb({ok:false,error:'Enter your name (at least 2 characters).'});if(!team)return cb({ok:false,error:'Select your team.'});if(game.status==='ended'||game.finaleStarted)return cb({ok:false,error:'The game has ended.'});let id=crypto.randomUUID();game.players[id]={id,name,team:team.id,online:true};s.data.role='player';s.data.playerId=id;s.join(ROOM_CODE);log(`${name} joined Team ${team.name}.`,team.id);broadcast();cb({ok:true,id,state:publicState()});});
+s.on('player:answer',(d,cb=()=>{})=>{if(s.data.role!=='player')return cb({ok:false,error:'Join the room first.'});let p=game.players[s.data.playerId];if(!p||!p.online)return cb({ok:false,error:'Reconnect to the room.'});if(game.status!=='running')return cb({ok:false,error:'The host has not started the quiz yet.'});if(game.questionWinner)return cb({ok:false,error:'This question is already solved. Wait for the next one.'});let q=questions[game.questionIndex];if(!q)return cb({ok:false,error:'No active question.'});if(!q.answers.map(norm).includes(norm(d?.answer))){return cb({ok:false,error:'Not quite—try again!'});}game.questionWinner={team:p.team,name:p.name,index:game.questionIndex};game.scores[p.team]++;game.heads=Math.min(10,game.heads+1);game.headEvents.push({head:game.heads,team:p.team,name:p.name,question:game.questionIndex+1,at:Date.now()});log(`💥 ${teamById(p.team).name} scores! ${p.name} solved Question ${game.questionIndex+1}. Ravan head ${game.heads} bursts!`,p.team);broadcast();cb({ok:true,message:'Correct! Your team scored 1 point and burst a Ravan head.'});});
+s.on('player:hint',(_,cb=()=>{})=>{if(s.data.role!=='player')return cb({ok:false,error:'Join the room first.'});cb({ok:true,hint:questions[game.questionIndex]?.hint||'No hint available.'});});
+s.on('host:login',(d,cb=()=>{})=>{if(String(d?.username||'')!==HOST_USER||String(d?.password||'')!==HOST_PASSWORD)return cb({ok:false,error:'Incorrect host login.'});s.data.role='host';s.join(ROOM_CODE);cb({ok:true,state:publicState()});});
+s.on('host:action',(d,cb=()=>{})=>{if(s.data.role!=='host')return cb({ok:false,error:'Host login required.'});switch(d?.action){case'start':if(game.status!=='lobby')return cb({ok:false,error:'Reset the game before starting again.'});game.status='running';log('🚀 The shared quiz has started!');break;case'next':if(!game.questionWinner)return cb({ok:false,error:'A team must answer correctly before advancing.'});if(game.questionIndex>=questions.length-1){game.status='ended';game.winner=teams.slice().sort((a,b)=>game.scores[b.id]-game.scores[a.id])[0].id;log(`Quiz complete! Team ${teamById(game.winner).name} is the winner.`);}else{game.questionIndex++;game.questionWinner=null;log(`Question ${game.questionIndex+1} is live for all teams.`);}break;case'hint':log(`Host hint: ${questions[game.questionIndex]?.hint||''}`);break;case'finale':if(game.status!=='ended')return cb({ok:false,error:'Finish all 10 questions first.'});game.finaleStarted=true;game.heads=10;log('🎆 GRAND RAVAN DAHAN! All ten heads burst together!');break;case'reset':game=fresh();log('New game ready.');break;default:return cb({ok:false,error:'Unknown host action.'});}broadcast();cb({ok:true,state:publicState()});});
+s.on('disconnect',()=>{if(s.data.role==='player'&&game.players[s.data.playerId]){game.players[s.data.playerId].online=false;broadcast();}});});
+server.listen(PORT,'0.0.0.0',()=>console.log(`Mission Lanka listening on ${PORT}`));
