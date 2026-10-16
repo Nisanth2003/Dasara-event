@@ -1,15 +1,273 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mission Lanka — Live Dussehra Quiz</title><style>
-:root{--bg:#090d20;--panel:#151d3a;--gold:#ffd166;--orange:#ff713d;--text:#fff5e1;--muted:#b8c4e3;--green:#64edb1}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#35224b,#090d20 65%);color:var(--text);font:16px/1.5 system-ui,sans-serif}header{text-align:center;padding:22px 14px 18px;border-bottom:1px solid #ffffff20}.eyebrow{color:var(--gold);font-weight:900;letter-spacing:.2em}.logo{font-size:clamp(2.3rem,6vw,4rem);font-weight:1000;line-height:1.1;background:linear-gradient(90deg,#fff2c5,#ffc857,#ff7043);color:transparent;background-clip:text}.muted{color:var(--muted)}main{max-width:1180px;margin:auto;padding:18px 14px 45px}.card{background:linear-gradient(145deg,#1b2548,#10162d);border:1px solid #ffffff20;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 14px 35px #0003}.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:15px}.hidden{display:none!important}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.field{display:grid;gap:5px;margin:11px 0}.field input,.field select{width:100%;padding:12px;background:#080f25;color:white;border:1px solid #53618b;border-radius:9px;font:inherit}button{background:linear-gradient(135deg,var(--gold),#ff9b42);border:0;border-radius:10px;padding:11px 15px;font-weight:850;cursor:pointer;color:#26172b}button.alt{background:#29385f;color:white}button.danger{background:linear-gradient(135deg,#ff7658,#d92e55);color:white}.pill{display:inline-block;padding:4px 9px;border-radius:20px;background:#ffffff12;color:var(--gold);font-size:.8rem;font-weight:850}.notice{background:#ffc85712;border-left:3px solid var(--gold);padding:10px 13px}.question{font-size:clamp(1.25rem,3vw,2rem);font-weight:800;line-height:1.3;margin:18px 0}.scoregrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.team{background:#080f25;border:1px solid #ffffff22;border-radius:12px;padding:10px;text-align:center}.team b{display:block;color:var(--gold);font-size:1.05rem}.score{font-size:2rem;font-weight:950}.heads{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.head{font-size:clamp(2rem,5vw,3.4rem);text-align:center;background:#080f25;border:1px solid #ffffff25;border-radius:12px;padding:8px;position:relative}.head.burned{animation:burst .85s ease forwards}.head.burned:after{content:'💥';position:absolute;inset:0;display:grid;place-items:center;font-size:2.7rem;animation:pop .8s ease forwards}.head.burned{filter:grayscale(1);opacity:.3}@keyframes burst{40%{transform:scale(1.25);filter:drop-shadow(0 0 25px #ff7b22)}100%{transform:scale(.3);opacity:.12}}@keyframes pop{0%{transform:scale(.1);opacity:0}35%{transform:scale(1.4);opacity:1}100%{transform:scale(1.8);opacity:0}}.bigfire{font-size:clamp(5rem,15vw,10rem);text-align:center;line-height:1.2;animation:fire .65s infinite alternate;filter:drop-shadow(0 0 18px #ff762a)}@keyframes fire{to{transform:scale(1.08) rotate(1deg);filter:drop-shadow(0 0 45px #ffb02e)}}.feed{max-height:220px;overflow:auto}.feeditem{padding:8px 0;border-bottom:1px solid #ffffff12}.status{color:var(--green);font-weight:800}.answerrow{display:flex;gap:8px}.answerrow input{flex:1;min-width:0;padding:12px;background:#080f25;color:white;border:1px solid #53618b;border-radius:9px;font:inherit}.winner{font-size:clamp(1.5rem,4vw,2.5rem);color:var(--gold);font-weight:1000;text-align:center}@media(max-width:760px){.grid{grid-template-columns:1fr}.scoregrid{grid-template-columns:repeat(2,1fr)}.heads{grid-template-columns:repeat(5,1fr)}}
-</style></head><body><header><div class="eyebrow">VIRTUAL DUSSEHRA MISSION</div><div class="logo">MISSION LANKA</div><p class="muted">10 shared questions · 5 teams · 10 Ravan heads · One grand Dahan</p></header><main>
-<section id="entry" class="card"><span class="pill">JOIN THE LIVE ROOM</span><h2>Enter Mission Lanka</h2><p class="muted">All teams see the same question at the same time. First correct answer wins that question for the team.</p><div class="field"><label>Your name</label><input id="name" autocomplete="name" placeholder="Enter your name"></div><div class="field"><label>Choose your team</label><select id="team"><option value="agni">🔥 Team Agni</option><option value="vayu">🌬️ Team Vayu</option><option value="astra">🏹 Team Astra</option><option value="vajra">⚡ Team Vajra</option><option value="surya">☀️ Team Surya</option></select></div><div class="field"><label>Room code</label><input id="roomcode" value="LANKA25" autocomplete="off"></div><button onclick="joinGame()">Join game →</button><p id="joinmsg" class="muted"></p><p class="muted">Host? Open the private <a href="/host.html" style="color:#ffd166">host control room</a>.</p></section>
-<section id="player" class="hidden"><div class="grid"><div><div class="card"><div class="row" style="justify-content:space-between"><span class="pill" id="playerteam">TEAM</span><span class="status" id="gamestatus">Waiting for host</span></div><h2 id="pheading">Waiting for the host to start…</h2><div id="pquestion" class="question">The next question will appear here for everyone.</div><div class="answerrow"><input id="answer" placeholder="Type your answer" autocomplete="off"><button onclick="submitAnswer()">Submit</button></div><div class="row" style="margin-top:10px"><button class="alt" onclick="getHint()">Ask for hint</button><span id="feedback" class="muted"></span></div><div id="hint" class="notice hidden"></div></div><div class="card"><h3>Live leaderboard</h3><div id="pscores" class="scoregrid"></div></div></div><div><div class="card"><h3>Ravan Dahan progress</h3><div id="pheads" class="heads"></div><p class="muted">Every correct answer bursts one head on the shared host screen.</p></div><div class="card"><h3>Live activity</h3><div id="pfeed" class="feed"></div></div></div></div></section>
-<section id="hostlogin" class="hidden card"><span class="pill">PRIVATE HOST ACCESS</span><h2>Host control room</h2><p class="muted">Login fields appear only on this private route. They will not be shown on the player join page or host dashboard.</p><div class="field"><label>Host username</label><input id="hostuser" autocomplete="username"></div><div class="field"><label>Host password</label><input id="hostpass" type="password" autocomplete="current-password"></div><button onclick="hostLogin()">Login to host dashboard</button><p id="hostloginmsg" class="muted"></p></section>
-<section id="host" class="hidden"><div class="row" style="justify-content:space-between"><div><span class="pill">MISSION CONTROL</span><h2>Host dashboard</h2></div><div class="row"><span class="pill" id="hostroom">ROOM</span><button class="alt" onclick="fullscreen()">⛶ Full screen</button></div></div><div class="grid"><div><div class="card"><div class="row" style="justify-content:space-between"><span class="pill" id="qcount">QUESTION 0 / 10</span><span class="status" id="hstatus">LOBBY</span></div><div id="hquestion" class="question">Welcome, warriors of Lanka! Waiting for players…</div><div id="winnerbox" class="notice">The first correct answer awards 1 point and bursts one head.</div><div class="row" style="margin-top:15px"><button id="startbtn" onclick="hostAction('start')">Start quiz</button><button id="nextbtn" onclick="hostAction('next')" class="hidden">Next question →</button><button onclick="hostAction('reset')" class="alt">Reset game</button></div></div><div class="card"><h3>Leaderboard</h3><div id="hscores" class="scoregrid"></div></div><div class="card"><h3>Players online</h3><div id="players"></div></div></div><div><div class="card"><h3>Ravan Dahan — 10 heads</h3><div id="hheads" class="heads"></div><div class="bigfire" id="fire">🔥</div><p class="muted">One head bursts for each question solved. The grand Dahan is host-controlled after Question 10.</p><button id="finalebtn" class="danger" onclick="hostAction('finale')" disabled>Grand Ravan Dahan 🔥</button><div id="victory" class="winner hidden"></div></div><div class="card"><h3>Live activity</h3><div id="hfeed" class="feed"></div></div></div></div></section>
-<section id="finale" class="hidden card"><div class="winner">🏆 TEAM <span id="winteam"></span> WINS! 🏆</div><h2 style="text-align:center">THE GRAND RAVAN DAHAN</h2><div class="bigfire">🔥</div><div id="fheads" class="heads"></div><div class="winner">VICTORY OF GOOD OVER EVIL!</div><p style="text-align:center" class="muted">Happy Dussehra! 🪔</p></section>
-</main><script src="/socket.io/socket.io.js"></script><script>
-const socket=io();let role=null,playerId=null,lastHeads=0,lastState=null;const $=id=>document.getElementById(id);const teams=[['agni','Agni','🔥'],['vayu','Vayu','🌬️'],['astra','Astra','🏹'],['vajra','Vajra','⚡'],['surya','Surya','☀️']];function show(id){['entry','player','hostlogin','host','finale'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}function headsHtml(n,animate=false){return Array.from({length:10},(_,i)=>`<div class="head ${i<n?'burned':''}" data-head="${i+1}">${teams[i%5][2]}</div>`).join('');}function scoreHtml(ts){return ts.slice().sort((a,b)=>b.score-a.score).map(t=>`<div class="team"><span>${t.icon}</span><b>${t.name}</b><div class="score">${t.score}</div><small>${t.members} online</small></div>`).join('');}function feedHtml(feed){return feed.slice().reverse().map(x=>`<div class="feeditem">${escapeHtml(x.message)}</div>`).join('')||'<p class="muted">No activity yet.</p>';}function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function joinGame(){const d={name:$('name').value,team:$('team').value,code:$('roomcode').value};socket.emit('player:join',d,r=>{if(!r.ok){$('joinmsg').textContent=r.error;return;}role='player';playerId=r.id;$('playerteam').textContent='TEAM '+teams.find(t=>t[0]===d.team)[1].toUpperCase();show('player');render(r.state||lastState);});}function submitAnswer(){if(!$('answer').value.trim())return;$('feedback').textContent='Submitting…';socket.emit('player:answer',{answer:$('answer').value},r=>{$('feedback').textContent=r.message||r.error;$('answer').value='';if(r.ok)$('feedback').style.color='#64edb1';else $('feedback').style.color='#ffb4a8';});}function getHint(){socket.emit('player:hint',{},r=>{$('hint').textContent=r.hint||r.error;$('hint').classList.remove('hidden');});}$('answer').addEventListener('keydown',e=>{if(e.key==='Enter')submitAnswer();});
-function hostLogin(){socket.emit('host:login',{username:$('hostuser').value,password:$('hostpass').value},r=>{if(!r.ok){$('hostloginmsg').textContent=r.error;return;}role='host';show('host');render(r.state);});}function hostAction(action){socket.emit('host:action',{action},r=>{if(!r.ok)alert(r.error);else render(r.state);});}function fullscreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();}
-function render(s){if(!s)return;lastState=s;if(role==='player'&&$('player').classList.contains('hidden'))show('player');if(role==='host'&&$('host').classList.contains('hidden')&&!s.finaleStarted)show('host');const qNum=Math.min(s.questionIndex+1,s.questionCount);if(role==='player'){$('gamestatus').textContent=s.status.toUpperCase();$('pheading').textContent=s.status==='lobby'?'Waiting for host to start…':s.status==='ended'?'Quiz complete! Check the final leaderboard.':`Question ${qNum} of ${s.questionCount}`;$('pquestion').textContent=s.currentQuestion||'The quiz has ended.';$('pscores').innerHTML=scoreHtml(s.teams);$('pheads').innerHTML=headsHtml(s.heads);$('pfeed').innerHTML=feedHtml(s.feed);if(s.questionWinner)$('feedback').textContent=`${s.questionWinner.name} (${teams.find(t=>t[0]===s.questionWinner.team)?.[1]}) solved it!`;}if(role==='host'){$('hostroom').textContent='ROOM '+s.code;$('qcount').textContent=`QUESTION ${s.status==='lobby'?0:Math.min(s.questionIndex+1,10)} / 10`;$('hstatus').textContent=s.status.toUpperCase();$('hquestion').textContent=s.currentQuestion|| (s.status==='ended'?'All 10 questions are complete!':'Welcome, warriors of Lanka! Waiting for players…');$('winnerbox').textContent=s.questionWinner?`✅ ${s.questionWinner.name} from Team ${teams.find(t=>t[0]===s.questionWinner.team)?.[1]} answered correctly — +1 point, head ${s.heads} burst!`:'First correct answer wins this question, earns 1 point, and bursts one head.';$('startbtn').classList.toggle('hidden',s.status!=='lobby');$('nextbtn').classList.toggle('hidden',!s.questionWinner||s.status!=='running');$('finalebtn').disabled=s.status!=='ended';$('hscores').innerHTML=scoreHtml(s.teams);$('players').innerHTML=s.players.map(p=>`<div class="feeditem">${escapeHtml(p.name)} — ${teams.find(t=>t[0]===p.team)?.[1]} <span class="muted">● ${p.online?'online':'offline'}</span></div>`).join('')||'<p class="muted">Waiting for players to join.</p>';$('hheads').innerHTML=headsHtml(s.heads);$('hfeed').innerHTML=feedHtml(s.feed);if(s.finaleStarted){show('finale');const winner=s.teams.slice().sort((a,b)=>b.score-a.score)[0];$('winteam').textContent=winner?.name||'ALL TEAMS';$('fheads').innerHTML=headsHtml(10);}}if(role==='player'&&s.finaleStarted){show('finale');const winner=s.teams.slice().sort((a,b)=>b.score-a.score)[0];$('winteam').textContent=winner?.name||'ALL TEAMS';$('fheads').innerHTML=headsHtml(10);}if(s.heads>lastHeads){document.querySelectorAll('.head').forEach(el=>{const n=Number(el.dataset.head);if(n>lastHeads&&n<=s.heads){el.classList.remove('burned');void el.offsetWidth;el.classList.add('burned');}});}lastHeads=s.heads;}
-socket.on('state',s=>{lastState=s;if(role)render(s);});if(location.pathname==='/host.html'){show('hostlogin');}else{show('entry');}
-</script></body></html>
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Lanka — Live Dussehra Quiz</title>
+<style>
+:root{--bg:#090d20;--panel:#151d3a;--gold:#ffd166;--orange:#ff713d;--text:#fff5e1;--muted:#b8c4e3;--green:#64edb1}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#35224b,#090d20 65%);color:var(--text);font:16px/1.5 system-ui,sans-serif}
+header{text-align:center;padding:22px 14px 18px;border-bottom:1px solid #ffffff20}
+.eyebrow{color:var(--gold);font-weight:900;letter-spacing:.2em}
+.logo{font-size:clamp(2.3rem,6vw,4rem);font-weight:1000;line-height:1.1;background:linear-gradient(90deg,#fff2c5,#ffc857,#ff7043);color:transparent;background-clip:text}
+.muted{color:var(--muted)}
+main{max-width:1180px;margin:auto;padding:18px 14px 45px}
+.card{background:linear-gradient(145deg,#1b2548,#10162d);border:1px solid #ffffff20;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 14px 35px #0003}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:15px}
+.hidden{display:none!important}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.field{display:grid;gap:5px;margin:11px 0}
+.field input,.field select{width:100%;padding:12px;background:#080f25;color:white;border:1px solid #53618b;border-radius:9px;font:inherit}
+button{background:linear-gradient(135deg,var(--gold),#ff9b42);border:0;border-radius:10px;padding:11px 15px;font-weight:850;cursor:pointer;color:#26172b}
+button.alt{background:#29385f;color:white}
+button.danger{background:linear-gradient(135deg,#ff7658,#d92e55);color:white}
+button:disabled{opacity:.4;cursor:not-allowed}
+.pill{display:inline-block;padding:4px 9px;border-radius:20px;background:#ffffff12;color:var(--gold);font-size:.8rem;font-weight:850}
+.notice{background:#ffc85712;border-left:3px solid var(--gold);padding:10px 13px}
+.question{font-size:clamp(1.25rem,3vw,2rem);font-weight:800;line-height:1.3;margin:18px 0}
+.scoregrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.team{background:#080f25;border:1px solid #ffffff22;border-radius:12px;padding:10px;text-align:center}
+.team b{display:block;color:var(--gold);font-size:1.05rem}
+.score{font-size:2rem;font-weight:950}
+.heads{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+.head{font-size:clamp(2rem,5vw,3.4rem);text-align:center;background:#080f25;border:1px solid #ffffff25;border-radius:12px;padding:8px;position:relative}
+.head.burned{animation:burst .85s ease forwards}
+.head.burned:after{content:'💥';position:absolute;inset:0;display:grid;place-items:center;font-size:2.7rem;animation:pop .8s ease forwards}
+.head.burned{filter:grayscale(1);opacity:.3}
+@keyframes burst{40%{transform:scale(1.25);filter:drop-shadow(0 0 25px #ff7b22)}100%{transform:scale(.3);opacity:.12}}
+@keyframes pop{0%{transform:scale(.1);opacity:0}35%{transform:scale(1.4);opacity:1}100%{transform:scale(1.8);opacity:0}}
+.bigfire{font-size:clamp(5rem,15vw,10rem);text-align:center;line-height:1.2;animation:fire .65s infinite alternate;filter:drop-shadow(0 0 18px #ff762a)}
+@keyframes fire{to{transform:scale(1.08) rotate(1deg);filter:drop-shadow(0 0 45px #ffb02e)}}
+.feed{max-height:220px;overflow:auto}
+.feeditem{padding:8px 0;border-bottom:1px solid #ffffff12}
+.status{color:var(--green);font-weight:800}
+.answerrow{display:flex;gap:8px}
+.answerrow input{flex:1;min-width:0;padding:12px;background:#080f25;color:white;border:1px solid #53618b;border-radius:9px;font:inherit}
+.winner{font-size:clamp(1.5rem,4vw,2.5rem);color:var(--gold);font-weight:1000;text-align:center}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.scoregrid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">VIRTUAL DUSSEHRA MISSION</div>
+<div class="logo">MISSION LANKA</div>
+<p class="muted">10 shared questions · 5 teams · 10 Ravan heads · One grand Dahan</p>
+</header>
+<main>
+<section id="entry" class="card">
+<span class="pill">JOIN THE LIVE ROOM</span>
+<h2>Enter Mission Lanka</h2>
+<p class="muted">All teams see the same question at the same time. The first correct answer wins the question for its team.</p>
+<div class="field"><label>Your name</label><input id="name" autocomplete="name" placeholder="Enter your name"></div>
+<div class="field"><label>Choose your team</label>
+<select id="team">
+<option value="agni">🔥 Team Agni</option>
+<option value="vayu">🌬️ Team Vayu</option>
+<option value="astra">🏹 Team Astra</option>
+<option value="vajra">⚡ Team Vajra</option>
+<option value="surya">☀️ Team Surya</option>
+</select></div>
+<div class="field"><label>Room code</label><input id="roomcode" value="LANKA25" autocomplete="off"></div>
+<button onclick="joinGame()">Join game →</button>
+<p id="joinmsg" class="muted"></p>
+<p class="muted">Host? Open the <a href="/host.html" style="color:#ffd166">host control room</a>.</p>
+</section>
+
+<section id="player" class="hidden">
+<div class="grid">
+<div>
+<div class="card">
+<div class="row" style="justify-content:space-between"><span class="pill" id="playerteam">TEAM</span><span class="status" id="gamestatus">Waiting for host</span></div>
+<h2 id="pheading">Waiting for the host to start…</h2>
+<div id="pquestion" class="question">The next question will appear here for everyone.</div>
+<div class="answerrow"><input id="answer" placeholder="Type your answer" autocomplete="off"><button onclick="submitAnswer()">Submit</button></div>
+<div class="row" style="margin-top:10px"><button class="alt" onclick="getHint()">Ask for hint</button><span id="feedback" class="muted"></span></div>
+<div id="hint" class="notice hidden"></div>
+</div>
+<div class="card"><h3>Live leaderboard</h3><div id="pscores" class="scoregrid"></div></div>
+</div>
+<div>
+<div class="card"><h3>Ravan Dahan progress</h3><div id="pheads" class="heads"></div><p class="muted">Every correct answer bursts one head on the shared host screen.</p></div>
+<div class="card"><h3>Live activity</h3><div id="pfeed" class="feed"></div></div>
+</div>
+</div>
+</section>
+
+<section id="hostlogin" class="hidden card">
+<span class="pill">PRIVATE HOST ACCESS</span>
+<h2>Host control room</h2>
+<p class="muted">Log in here. Your credentials are not shown on the player join page or dashboard.</p>
+<div class="field"><label>Host username</label><input id="hostuser" autocomplete="username"></div>
+<div class="field"><label>Host password</label><input id="hostpass" type="password" autocomplete="current-password"></div>
+<button onclick="hostLogin()">Login to host dashboard</button>
+<p id="hostloginmsg" class="muted"></p>
+</section>
+
+<section id="host" class="hidden">
+<div class="row" style="justify-content:space-between">
+<div><span class="pill">MISSION CONTROL</span><h2>Host dashboard</h2></div>
+<div class="row"><span class="pill" id="hostroom">ROOM</span><button class="alt" onclick="fullscreen()">⛶ Full screen</button></div>
+</div>
+<div class="grid">
+<div>
+<div class="card">
+<div class="row" style="justify-content:space-between"><span class="pill" id="qcount">QUESTION 0 / 10</span><span class="status" id="hstatus">LOBBY</span></div>
+<div id="hquestion" class="question">Welcome, warriors of Lanka! Waiting for players…</div>
+<div id="winnerbox" class="notice">The first correct answer awards 1 point and bursts one head.</div>
+<div class="row" style="margin-top:15px">
+<button id="startbtn" onclick="hostAction('start')">Start quiz</button>
+<button id="nextbtn" onclick="hostAction('next')" class="hidden">Next question →</button>
+<button onclick="hostAction('reset')" class="alt">Reset game</button>
+</div>
+</div>
+<div class="card"><h3>Leaderboard</h3><div id="hscores" class="scoregrid"></div></div>
+<div class="card"><h3>Players online</h3><div id="players"></div></div>
+</div>
+<div>
+<div class="card">
+<h3>Ravan Dahan — 10 heads</h3>
+<div id="hheads" class="heads"></div>
+<div class="bigfire" id="fire">🔥</div>
+<p class="muted">One head bursts for each question solved. Grand Dahan is host-controlled after Question 10.</p>
+<button id="finalebtn" class="danger" onclick="hostAction('finale')" disabled>Grand Ravan Dahan 🔥</button>
+<div id="victory" class="winner hidden"></div>
+</div>
+<div class="card"><h3>Live activity</h3><div id="hfeed" class="feed"></div></div>
+</div>
+</div>
+</section>
+
+<section id="finale" class="hidden card">
+<div class="winner">🏆 TEAM <span id="winteam"></span> WINS! 🏆</div>
+<h2 style="text-align:center">THE GRAND RAVAN DAHAN</h2>
+<div class="bigfire">🔥</div>
+<div id="fheads" class="heads"></div>
+<div class="winner">VICTORY OF GOOD OVER EVIL!</div>
+<p style="text-align:center" class="muted">Happy Dussehra! 🪔</p>
+</section>
+</main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket=io();
+let role=null,playerId=null,lastHeads=0,lastState=null;
+const $=id=>document.getElementById(id);
+const teams=[['agni','Agni','🔥'],['vayu','Vayu','🌬️'],['astra','Astra','🏹'],['vajra','Vajra','⚡'],['surya','Surya','☀️']];
+
+function show(id){
+['entry','player','hostlogin','host','finale'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
+}
+function headsHtml(n){
+return Array.from({length:10},(_,i)=>`<div class="head ${i<n?'burned':''}" data-head="${i+1}">${teams[i%5][2]}</div>`).join('');
+}
+function scoreHtml(ts){
+return ts.slice().sort((a,b)=>b.score-a.score).map(t=>`<div class="team"><span>${t.icon}</span><b>${t.name}</b><div class="score">${t.score}</div><small>${t.members} online</small></div>`).join('');
+}
+function feedHtml(feed){
+return feed.slice().reverse().map(x=>`<div class="feeditem">${escapeHtml(x.message)}</div>`).join('')||'<p class="muted">No activity yet.</p>';
+}
+function escapeHtml(s){
+return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function joinGame(){
+const d={name:$('name').value,team:$('team').value,code:$('roomcode').value};
+socket.emit('player:join',d,r=>{
+if(!r.ok){$('joinmsg').textContent=r.error;return;}
+role='player';playerId=r.id;
+$('playerteam').textContent='TEAM '+teams.find(t=>t[0]===d.team)[1].toUpperCase();
+show('player');render(r.state||lastState);
+});
+}
+function submitAnswer(){
+if(!$('answer').value.trim())return;
+$('feedback').textContent='Submitting…';
+socket.emit('player:answer',{answer:$('answer').value},r=>{
+$('feedback').textContent=r.message||r.error;
+$('answer').value='';
+$('feedback').style.color=r.ok?'#64edb1':'#ffb4a8';
+});
+}
+function getHint(){
+socket.emit('player:hint',{},r=>{
+$('hint').textContent=r.hint||r.error;
+$('hint').classList.remove('hidden');
+});
+}
+$('answer').addEventListener('keydown',e=>{if(e.key==='Enter')submitAnswer();});
+
+function hostLogin(){
+socket.emit('host:login',{username:$('hostuser').value,password:$('hostpass').value},r=>{
+if(!r.ok){$('hostloginmsg').textContent=r.error;return;}
+role='host';show('host');render(r.state);
+});
+}
+function hostAction(action){
+socket.emit('host:action',{action},r=>{
+if(!r.ok)alert(r.error);else render(r.state);
+});
+}
+function fullscreen(){
+if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();
+else document.exitFullscreen?.();
+}
+function render(s){
+if(!s)return;
+lastState=s;
+if(role==='player'&&$('player').classList.contains('hidden'))show('player');
+if(role==='host'&&$('host').classList.contains('hidden')&&!s.finaleStarted)show('host');
+const qNum=Math.min(s.questionIndex+1,s.questionCount);
+
+if(role==='player'){
+$('gamestatus').textContent=s.status.toUpperCase();
+$('pheading').textContent=s.status==='lobby'?'Waiting for host to start…':s.status==='ended'?'Quiz complete! Check the final leaderboard.':`Question ${qNum} of ${s.questionCount}`;
+$('pquestion').textContent=s.currentQuestion||'The quiz has ended.';
+$('pscores').innerHTML=scoreHtml(s.teams);
+$('pheads').innerHTML=headsHtml(s.heads);
+$('pfeed').innerHTML=feedHtml(s.feed);
+if(s.questionWinner)$('feedback').textContent=`${s.questionWinner.name} from Team ${teams.find(t=>t[0]===s.questionWinner.team)?.[1]} solved it!`;
+}
+if(role==='host'){
+$('hostroom').textContent='ROOM '+s.code;
+$('qcount').textContent=`QUESTION ${s.status==='lobby'?0:Math.min(s.questionIndex+1,10)} / 10`;
+$('hstatus').textContent=s.status.toUpperCase();
+$('hquestion').textContent=s.currentQuestion||(s.status==='ended'?'All 10 questions are complete!':'Welcome, warriors of Lanka! Waiting for players…');
+$('winnerbox').textContent=s.questionWinner?`✅ ${s.questionWinner.name} from Team ${teams.find(t=>t[0]===s.questionWinner.team)?.[1]} answered correctly — +1 point, head ${s.heads} burst!`:'First correct answer wins this question, earns 1 point, and bursts one head.';
+$('startbtn').classList.toggle('hidden',s.status!=='lobby');
+$('nextbtn').classList.toggle('hidden',!s.questionWinner||s.status!=='running');
+$('finalebtn').disabled=s.status!=='ended';
+$('hscores').innerHTML=scoreHtml(s.teams);
+$('players').innerHTML=s.players.map(p=>`<div class="feeditem">${escapeHtml(p.name)} — ${teams.find(t=>t[0]===p.team)?.[1]} <span class="muted">● ${p.online?'online':'offline'}</span></div>`).join('')||'<p class="muted">Waiting for players to join.</p>';
+$('hheads').innerHTML=headsHtml(s.heads);
+$('hfeed').innerHTML=feedHtml(s.feed);
+if(s.finaleStarted){
+show('finale');
+const winner=s.teams.slice().sort((a,b)=>b.score-a.score)[0];
+$('winteam').textContent=winner?.name||'ALL TEAMS';
+$('fheads').innerHTML=headsHtml(10);
+}
+}
+if(role==='player'&&s.finaleStarted){
+show('finale');
+const winner=s.teams.slice().sort((a,b)=>b.score-a.score)[0];
+$('winteam').textContent=winner?.name||'ALL TEAMS';
+$('fheads').innerHTML=headsHtml(10);
+}
+if(s.heads>lastHeads){
+document.querySelectorAll('.head').forEach(el=>{
+const n=Number(el.dataset.head);
+if(n>lastHeads&&n<=s.heads){
+el.classList.remove('burned');void el.offsetWidth;el.classList.add('burned');
+}
+});
+}
+lastHeads=s.heads;
+}
+socket.on('state',s=>{lastState=s;if(role)render(s);});
+
+if(location.pathname==='/host.html')show('hostlogin');
+else show('entry');
+</script>
+</body>
+</html>
