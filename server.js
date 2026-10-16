@@ -1,5 +1,5 @@
 const express=require('express');const http=require('http');const {Server}=require('socket.io');const crypto=require('crypto');
-const app=express(),server=http.createServer(app),io=new Server(server);app.use(express.static('public'));app.get('/health',(_,res)=>res.json({ok:true,app:'Mission Lanka Shared Quiz'}));
+const app=express(),server=http.createServer(app),io=new Server(server);app.use(express.static('public'));app.get('/host.html',(_,res)=>res.sendFile(require('path').join(__dirname,'public','index.html')));app.get('/health',(_,res)=>res.json({ok:true,app:'Mission Lanka Shared Quiz'}));
 const PORT=process.env.PORT||3000,HOST_USER=process.env.HOST_USER||'host',HOST_PASSWORD=process.env.HOST_PASSWORD||'CHANGE_ME_BEFORE_DEPLOY',ROOM_CODE=(process.env.ROOM_CODE||'LANKA25').toUpperCase();
 const teams=[{id:'agni',name:'Agni',icon:'🔥'},{id:'vayu',name:'Vayu',icon:'🌬️'},{id:'astra',name:'Astra',icon:'🏹'},{id:'vajra',name:'Vajra',icon:'⚡'},{id:'surya',name:'Surya',icon:'☀️'}];
 const questions=[
